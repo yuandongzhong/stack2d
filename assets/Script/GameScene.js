@@ -8,16 +8,35 @@ cc.Class({
             default: null,
             type: cc.Prefab,
         },
+        scoreLabel: {
+            default: null,
+            type: cc.Label,
+        },
+
+        dropSound1: {
+            url: cc.AudioClip,
+            default: null,
+        },
+
+        dropSound2: {
+            url: cc.AudioClip,
+            default: null,
+        },
+
+        dropSound3: {
+            url: cc.AudioClip,
+            default: null,
+        },
     },
 
     onLoad () {
         this.blockCount = 0;
         this.prevBlockPos = 0;
         this.blockHeight = 0;
+        this.scoreLabel.string = 0;
         this.canvasEdgeLeft = -this.node.width / 2;
         this.canvasEdgeRight = this.node.width / 2;
-        this.minBlockWidth = 5;
-        
+    
         this.movingBlock = null;                                        // the current moving block
         this.lastBrick = null;                                          // the last 'dropped' block
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
@@ -126,23 +145,36 @@ cc.Class({
     trimBlock () {
         let block = this.movingBlock;
         let prevX = this.lastBrick.x;
-
         let dx = prevX - block.x;
 
-        if (block.width <= this.minBlockWidth && dx != 0) {
-            cc.director.loadScene("GameOver");
-        }
-
-        // if block dropped on left or right, then cut the edge and align the blocks
-        // if not, then do nothing
-        if (dx > 0 || dx < 0) {         
+        // Check if the block is dropped on the left or right
+        // Minimum threshold: 4px -> make the game easier for the player
+        if (dx != 0 && Math.abs(dx) > 4) {   
+            // Check if the drop is dropped on 'air'; if so, then game over.
+            if (Math.abs(dx) > (block.width/2 + this.lastBrick.width/2)) {
+                cc.director.loadScene("GameOver");
+                return; 
+            }
+            // If the block is not dropped on 'air', then trim and align the moving block
             let newWidth = block.width - Math.abs(dx);
             block.width = newWidth;
             block.x = block.x + dx/2;
+
+            // Play random drop sounds
+            if (Math.random() >= 0.5) {
+                cc.audioEngine.play(this.dropSound1, false, 1);
+            } else {
+                cc.audioEngine.play(this.dropSound2, false, 1);
+            }
+        } else {            // if the block is dropped 'perfectly' (within threshold)
+            cc.audioEngine.play(this.dropSound3, false, 0.7);
+            // auto align the blocks
+            block.width = this.lastBrick.width;
+            block.x = prevX;
         }
 
         this.lastBrick = block;
-        return;
+        this.scoreLabel.string += 1;
     },
 
     kill(blockNode) {

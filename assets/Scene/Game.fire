@@ -130,10 +130,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 10
+        "__id__": 11
       },
       {
-        "__id__": 11
+        "__id__": 12
       }
     ],
     "_prefab": null,
@@ -282,7 +282,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "BlocksContainer",
+    "_name": "ScoreLabel",
     "_objFlags": 0,
     "_parent": {
       "__id__": 4
@@ -293,10 +293,13 @@
     "_components": [
       {
         "__id__": 9
+      },
+      {
+        "__id__": 10
       }
     ],
     "_prefab": null,
-    "_id": "f7cLEtSr9PpZeSK2VMZiAv",
+    "_id": "213Mml6uxLf6Vs34sSNxbQ",
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
@@ -313,8 +316,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 640,
-      "height": 960
+      "width": 33.37,
+      "height": 60
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -323,7 +326,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 0
+      "y": 370
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -331,6 +334,28 @@
     "_globalZOrder": 0,
     "_opacityModifyRGB": false,
     "groupIndex": 0
+  },
+  {
+    "__type__": "cc.Label",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 8
+    },
+    "_enabled": true,
+    "_useOriginalSize": false,
+    "_actualFontSize": 60,
+    "_fontSize": 60,
+    "_lineHeight": 60,
+    "_enableWrapText": true,
+    "_N$file": null,
+    "_isSystemFontUsed": true,
+    "_spacingX": 0,
+    "_N$string": "0",
+    "_N$horizontalAlign": 1,
+    "_N$verticalAlign": 1,
+    "_N$fontFamily": "Arial",
+    "_N$overflow": 0
   },
   {
     "__type__": "cc.Widget",
@@ -342,10 +367,10 @@
     "_enabled": true,
     "isAlignOnce": true,
     "_target": null,
-    "_alignFlags": 45,
-    "_left": 0,
-    "_right": 0,
-    "_top": 0,
+    "_alignFlags": 17,
+    "_left": 260.065,
+    "_right": 282.065,
+    "_top": 80,
     "_bottom": 0,
     "_verticalCenter": 0,
     "_horizontalCenter": 0,
@@ -355,8 +380,8 @@
     "_isAbsBottom": true,
     "_isAbsHorizontalCenter": true,
     "_isAbsVerticalCenter": true,
-    "_originalWidth": 640,
-    "_originalHeight": 960
+    "_originalWidth": 97.87,
+    "_originalHeight": 0
   },
   {
     "__type__": "cc.Canvas",
@@ -384,6 +409,18 @@
     "_enabled": true,
     "blockPrefab": {
       "__uuid__": "5e76b6fc-4073-4ad5-90c1-9975ce1ae557"
+    },
+    "scoreLabel": {
+      "__id__": 9
+    },
+    "dropSound1": {
+      "__uuid__": "d6235713-adc1-47a9-9b67-ef3dfcd7339f"
+    },
+    "dropSound2": {
+      "__uuid__": "a04a5b93-4662-4b54-a567-2b97b5576b19"
+    },
+    "dropSound3": {
+      "__uuid__": "d1591418-0b14-4b3a-88ed-fa42c4fd82e3"
     }
   }
 ]
