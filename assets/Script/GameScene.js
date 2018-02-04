@@ -30,9 +30,21 @@ cc.Class({
     },
 
     onLoad () {
+        this.color = {
+            totalNumber: 7,
+            0: '#EA4C81',
+            1: '#5ABDD1',
+            2: '#33A9CE',
+            3: '71FEB9',
+            4: 'F4FEB9',
+            5: '72F7FE',
+            6: '36969D',
+        }
+
         this.blockCount = 0;
         this.prevBlockPos = 0;
         this.blockHeight = 0;
+        this.combo = 0;
         this.scoreLabel.string = 0;
         this.canvasEdgeLeft = -this.node.width / 2;
         this.canvasEdgeRight = this.node.width / 2;
@@ -67,12 +79,16 @@ cc.Class({
     //     // console.log("Block count total:" + this.blockCount());
     // },
 
+    // if max is 3, then expected output is: 0, 1 or 2
+    getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    },
+
     createPoolFor(quantity = 15) {
         this.blockPool = new cc.NodePool(blockScript);
         let initCount = quantity;
         for (let i = 0; i < initCount; ++i) {
             let block = cc.instantiate(this.blockPrefab);
-
             block.getComponent(blockScript).id = i;
             this.blockPool.put(block); 
         }
@@ -88,6 +104,9 @@ cc.Class({
                 block = cc.instantiate(this.blockPrefab);
             }   
 
+            let randomId = this.getRandomInt(this.color.totalNumber);
+            block.color = cc.hexToColor(this.color[randomId]);
+            
             block.setPosition(0, groundY + block.height * i);
             this.node.addChild(block);
             this.blockCount += 1;
@@ -109,6 +128,14 @@ cc.Class({
         } else {                                              
             this.movingBlock = cc.instantiate(this.blockPrefab);  
             // cc.log("Create 1 block without pool");
+        }
+
+        if (this.combo > 0) {
+            this.movingBlock.color = this.lastBrick.color;
+            this.movingBlock.runAction(cc.tintBy(0.1, -5, -10, 0))
+        } else {
+            let randomId = this.getRandomInt(this.color.totalNumber);
+            this.movingBlock.color = cc.hexToColor(this.color[randomId]);
         }
 
         this.movingBlock.width = this.lastBrick.width;
@@ -150,15 +177,7 @@ cc.Class({
         // Check if the block is dropped on the left or right
         // Minimum threshold: 4px -> make the game easier for the player
         if (dx != 0 && Math.abs(dx) > 4) {   
-            // Check if the drop is dropped on 'air'; if so, then game over.
-            if (Math.abs(dx) > (block.width/2 + this.lastBrick.width/2)) {
-                cc.director.loadScene("GameOver");
-                return; 
-            }
-            // If the block is not dropped on 'air', then trim and align the moving block
-            let newWidth = block.width - Math.abs(dx);
-            block.width = newWidth;
-            block.x = block.x + dx/2;
+            this.combo = 0;
 
             // Play random drop sounds
             if (Math.random() >= 0.5) {
@@ -166,8 +185,21 @@ cc.Class({
             } else {
                 cc.audioEngine.play(this.dropSound2, false, 1);
             }
+
+            // Check if the drop is dropped on 'air'; if so, then game over.
+            if (Math.abs(dx) > (block.width/2 + this.lastBrick.width/2)) {
+                cc.director.loadScene("GameOver");
+                return; 
+            }
+            
+            // If the block is not dropped on 'air', then trim and align the moving block
+            let newWidth = block.width - Math.abs(dx);
+            block.width = newWidth;
+            block.x = block.x + dx/2;
+
         } else {            // if the block is dropped 'perfectly' (within threshold)
-            cc.audioEngine.play(this.dropSound3, false, 0.7);
+            this.combo += 1;
+            cc.audioEngine.play(this.dropSound3, false, 0.5);
             // auto align the blocks
             block.width = this.lastBrick.width;
             block.x = prevX;
