@@ -27,6 +27,11 @@ cc.Class({
             url: cc.AudioClip,
             default: null,
         },
+
+        backgroundSound: {
+            url: cc.AudioClip,
+            default: null,
+        },
     },
 
     onLoad () {
@@ -64,9 +69,13 @@ cc.Class({
         // cc.PhysicsManager.DrawBits.e_centerOfMassBit |
         // cc.PhysicsManager.DrawBits.e_jointBit |
         // cc.PhysicsManager.DrawBits.e_shapeBit;   
+        // cc.audioEngine.preload(this.backgroundSound);
     },
 
     start () {
+
+        this.current = cc.audioEngine.play(this.backgroundSound, true, 0.5);
+
         cc.director.preloadScene("GameOver", function () {
             cc.log("Game over scene preloaded");
         });
@@ -106,7 +115,7 @@ cc.Class({
 
             let randomId = this.getRandomInt(this.color.totalNumber);
             block.color = cc.hexToColor(this.color[randomId]);
-            
+
             block.setPosition(0, groundY + block.height * i);
             this.node.addChild(block);
             this.blockCount += 1;

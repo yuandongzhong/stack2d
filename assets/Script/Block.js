@@ -68,7 +68,7 @@ cc.Class({
         let blockCount = this.scene.getComponent('GameScene').blockCount;
         let moveDown =  cc.moveBy(0.01, cc.v2(0, -this.node.height));
         // cc.log("pool node #" + this.id + ", pos" + this.node.getPosition()); 
-        if (blockCount >= 11) {
+        if (blockCount >= 15) {
             this.node.runAction(moveDown);
             // cc.log("move down")
             // cc.log("move down #" + this.id + "-------------------");
