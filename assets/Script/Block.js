@@ -45,11 +45,11 @@ cc.Class({
         let moveAction;
 
         if (side == 'left') {
-            let moveRight = cc.moveBy(1, cc.v2(distance, 0));
+            let moveRight = cc.moveBy(1.8, cc.v2(distance, 0));
             let moveLeft = moveRight.reverse();
             moveAction = cc.repeatForever(cc.sequence([moveRight, moveLeft]));
         } else {
-            let moveLeft = cc.moveBy(1, cc.v2(-distance, 0));
+            let moveLeft = cc.moveBy(1.8, cc.v2(-distance, 0));
             let moveRight = moveLeft.reverse();
             moveAction = cc.repeatForever(cc.sequence([moveLeft, moveRight]));
         }
@@ -68,10 +68,10 @@ cc.Class({
         let blockCount = this.scene.getComponent('GameScene').blockCount;
         let moveDown =  cc.moveBy(0.01, cc.v2(0, -this.node.height));
         // cc.log("pool node #" + this.id + ", pos" + this.node.getPosition()); 
-        if (blockCount >= 15) {
+        if (blockCount >= 13) {
             this.node.runAction(moveDown);
             // cc.log("move down")
-            // cc.log("move down #" + this.id + "-------------------");
+            // cc.log("move down 212A3A#" + this.id + "-------------------");
         }
         // cc.log("pool node #" + this.id + ", pos" + this.node.getPosition());    
 

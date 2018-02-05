@@ -1,4 +1,5 @@
 let blockScript = require('Block');
+let fragmentScript = require('Fragment');
 
 cc.Class({
     extends: cc.Component,
@@ -8,26 +9,27 @@ cc.Class({
             default: null,
             type: cc.Prefab,
         },
+
+        fragmentPrefab: {
+            default: null,
+            type: cc.Prefab,
+        },  
         scoreLabel: {
             default: null,
             type: cc.Label,
         },
-
         dropSound1: {
             url: cc.AudioClip,
             default: null,
         },
-
         dropSound2: {
             url: cc.AudioClip,
             default: null,
         },
-
         dropSound3: {
             url: cc.AudioClip,
             default: null,
         },
-
         backgroundSound: {
             url: cc.AudioClip,
             default: null,
@@ -93,25 +95,46 @@ cc.Class({
         return Math.floor(Math.random() * max);
     },
 
-    createPoolFor(quantity = 15) {
+    createPoolFor(quantity = 16) {
+        // create pool for blocks
         this.blockPool = new cc.NodePool(blockScript);
-        let initCount = quantity;
-        for (let i = 0; i < initCount; ++i) {
+        for (let i = 0; i < quantity; ++i) {
             let block = cc.instantiate(this.blockPrefab);
             block.getComponent(blockScript).id = i;
             this.blockPool.put(block); 
         }
+
+        // // create pool for fragment blocks
+        // this.fragmentPool = new cc.NodePool(fragmentScript);
+        // for (let i = 0; i < quantity/2; ++i) {
+        //     let fragment = cc.instantiate(this.fragmentPrefab);
+        //     this.fragmentPool.put(fragment); 
+        // }
+    },
+
+    getBlock() {
+        if (this.blockPool.size() > 0) {                // use size method to check if there're nodes available in the pool
+            return this.blockPool.get();
+        } else {                                        // if not enough node in the pool, we call cc.instantiate to create node
+            return cc.instantiate(this.blockPrefab);
+        }   
+    }, 
+
+
+    getFragment() {
+        return cc.instantiate(this.fragmentPrefab);
+        // if (this.fragmentPool.size() > 0) {                // use size method to check if there're nodes available in the pool
+        //     return this.fragmentPool.get();
+        // } else {                                        // if not enough node in the pool, we call cc.instantiate to create node
+        //     return cc.instantiate(this.fragmentPrefab);
+        // }   
     },
 
     spawnBaseBlocksFor (baseBlockNumber) {
         let groundY = -this.node.height / 2;
         let block = null;
         for(let i = 0; i < baseBlockNumber; i++) {
-            if (this.blockPool.size() > 0) {                // use size method to check if there're nodes available in the pool
-                block = this.blockPool.get();
-            } else {                                        // if not enough node in the pool, we call cc.instantiate to create node
-                block = cc.instantiate(this.blockPrefab);
-            }   
+            block = this.getBlock();
 
             let randomId = this.getRandomInt(this.color.totalNumber);
             block.color = cc.hexToColor(this.color[randomId]);
@@ -130,14 +153,7 @@ cc.Class({
         this.blockCount += 1;
         let prevY = this.lastBrick.y;
         this.movingBlock = null;
-
-        if (this.blockPool.size() > 0) {           
-            this.movingBlock = this.blockPool.get();
-            // cc.log("Get 1 block from pool");
-        } else {                                              
-            this.movingBlock = cc.instantiate(this.blockPrefab);  
-            // cc.log("Create 1 block without pool");
-        }
+        this.movingBlock = this.getBlock();
 
         if (this.combo > 0) {
             this.movingBlock.color = this.lastBrick.color;
@@ -179,6 +195,7 @@ cc.Class({
     },
 
     trimBlock () {
+        let self = this;
         let block = this.movingBlock;
         let prevX = this.lastBrick.x;
         let dx = prevX - block.x;
@@ -205,6 +222,38 @@ cc.Class({
             let newWidth = block.width - Math.abs(dx);
             block.width = newWidth;
             block.x = block.x + dx/2;
+
+            // drop the fragment
+            let fragment = this.getFragment();
+            fragment.color = block.color;
+            fragment.width = Math.abs(dx);
+
+            let jumpAction = null;
+            if (dx > 0) {
+                fragment.setPosition(prevX - this.lastBrick.width/2 - fragment.width/2, block.y);
+                jumpAction = cc.jumpBy(0.6, cc.p(-45, 0), 60, 1)
+            } else {
+                fragment.setPosition(prevX + this.lastBrick.width/2 + fragment.width/2, block.y);
+                jumpAction = cc.jumpBy(0.6, cc.p(45, 0), 60, 1)
+            }
+
+
+            this.node.addChild(fragment);
+            // let bezier = [cc.p(0, 20), cc.p(30, -10), cc.p(30, 10)];
+            // let bezierForward = cc.bezierBy(1, bezier);
+            let spawn = cc.spawn(cc.fadeOut(0.5),
+                                 cc.rotateBy(1, 360),
+                                 jumpAction,
+                                 cc.moveBy(3, cc.p(0, -150)));
+            // fragment.runAction(spawn);
+            // let recycleFragment = cc.callFunc(function () {
+            //     fragment.getComponent(fragmentScript).recycle();
+            //     fragmentScript = null;
+            // }, self);
+            let kill = cc.callFunc(function() {
+                fragment.getComponent(fragmentScript).kill();
+            });
+            fragment.runAction(cc.sequence(spawn, cc.delayTime(0.5), kill));
 
         } else {            // if the block is dropped 'perfectly' (within threshold)
             this.combo += 1;
