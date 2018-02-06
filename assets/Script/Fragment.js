@@ -58,7 +58,7 @@ cc.Class({
 
     kill() {
         this.node.destroy();
-        cc.log("Kill!");
+        // cc.log("Kill!");
     }, 
 
     // update (dt) {

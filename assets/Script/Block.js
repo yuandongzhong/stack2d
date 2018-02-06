@@ -5,8 +5,8 @@ cc.Class({
         id: null,
         label: {
             default: null,
-            type: cc.Label
-        }
+            type: cc.Label,
+        },
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -16,11 +16,8 @@ cc.Class({
         this.scene = cc.find('Canvas');
         let eventController = cc.find('EventController').getComponent('RegisterEvents');
         eventController.subscribeEvent('tap', this.callback, this);
-        // this.moveLength = this.scene.width - this.node.width;
-
         // this.label.string = this.id;
     },
-
 
     // start () {
     // },
@@ -30,7 +27,6 @@ cc.Class({
         this.scene = cc.find('Canvas');
         let eventController = cc.find('EventController').getComponent('RegisterEvents');
         eventController.subscribeEvent('tap', this.callback, this);
-        // this.moveLength = this.scene.width - this.node.width;
     },
 
     unuse () {
@@ -40,16 +36,16 @@ cc.Class({
         this.node.stopAllActions();
     },
 
-    moveFrom(side, distance) {
+    moveFrom(duration, side, distance) {
 
         let moveAction;
 
         if (side == 'left') {
-            let moveRight = cc.moveBy(1.8, cc.v2(distance, 0));
+            let moveRight = cc.moveBy(duration, cc.v2(distance, 0));
             let moveLeft = moveRight.reverse();
             moveAction = cc.repeatForever(cc.sequence([moveRight, moveLeft]));
         } else {
-            let moveLeft = cc.moveBy(1.8, cc.v2(-distance, 0));
+            let moveLeft = cc.moveBy(duration, cc.v2(-distance, 0));
             let moveRight = moveLeft.reverse();
             moveAction = cc.repeatForever(cc.sequence([moveLeft, moveRight]));
         }
@@ -79,8 +75,8 @@ cc.Class({
             // cc.log("put node #" + this.id + " -------------------");
             this.scene.getComponent('GameScene').kill(this.node);
         } 
-    },
 
+    },
 
     // update (dt) {
  

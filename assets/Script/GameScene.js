@@ -1,15 +1,14 @@
 let blockScript = require('Block');
 let fragmentScript = require('Fragment');
+let sparkScript = require('Spark');
 
 cc.Class({
     extends: cc.Component,
-
     properties: {
         blockPrefab: {
             default: null,
             type: cc.Prefab,
         },
-
         fragmentPrefab: {
             default: null,
             type: cc.Prefab,
@@ -34,6 +33,13 @@ cc.Class({
             url: cc.AudioClip,
             default: null,
         },
+        sparkParticlePrefab: {
+            default: null,
+            type: cc.Prefab,
+        },
+
+        minMoveDuration: 0.1,
+        maxMoveDuration: 2.3, 
     },
 
     onLoad () {
@@ -55,12 +61,14 @@ cc.Class({
         this.scoreLabel.string = 0;
         this.canvasEdgeLeft = -this.node.width / 2;
         this.canvasEdgeRight = this.node.width / 2;
+        this.moveDuration = this.maxMoveDuration;
     
         this.movingBlock = null;                                        // the current moving block
         this.lastBrick = null;                                          // the last 'dropped' block
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
 
-        this.createPoolFor(15);
+        this.createBlockPoolFor(15);
+        // this.createSparkPoolFor(7);
         this.spawnBaseBlocksFor(4);     
         this.spawnNewBlock(); 
         this.setInputControl();
@@ -75,9 +83,7 @@ cc.Class({
     },
 
     start () {
-
         this.current = cc.audioEngine.play(this.backgroundSound, true, 0.5);
-
         cc.director.preloadScene("GameOver", function () {
             cc.log("Game over scene preloaded");
         });
@@ -95,7 +101,7 @@ cc.Class({
         return Math.floor(Math.random() * max);
     },
 
-    createPoolFor(quantity = 16) {
+    createBlockPoolFor(quantity = 16) {
         // create pool for blocks
         this.blockPool = new cc.NodePool(blockScript);
         for (let i = 0; i < quantity; ++i) {
@@ -103,13 +109,6 @@ cc.Class({
             block.getComponent(blockScript).id = i;
             this.blockPool.put(block); 
         }
-
-        // // create pool for fragment blocks
-        // this.fragmentPool = new cc.NodePool(fragmentScript);
-        // for (let i = 0; i < quantity/2; ++i) {
-        //     let fragment = cc.instantiate(this.fragmentPrefab);
-        //     this.fragmentPool.put(fragment); 
-        // }
     },
 
     getBlock() {
@@ -120,14 +119,15 @@ cc.Class({
         }   
     }, 
 
+    getSpark() {
+        let spark = cc.instantiate(this.sparkParticlePrefab);
+        // if the spark created from scratch, then set auto remove
+        spark.autoRemoveOnFinish = true;  
+        return spark;
+    },
 
     getFragment() {
         return cc.instantiate(this.fragmentPrefab);
-        // if (this.fragmentPool.size() > 0) {                // use size method to check if there're nodes available in the pool
-        //     return this.fragmentPool.get();
-        // } else {                                        // if not enough node in the pool, we call cc.instantiate to create node
-        //     return cc.instantiate(this.fragmentPrefab);
-        // }   
     },
 
     spawnBaseBlocksFor (baseBlockNumber) {
@@ -156,11 +156,17 @@ cc.Class({
         this.movingBlock = this.getBlock();
 
         if (this.combo > 0) {
+            // Darken the color for combos
             this.movingBlock.color = this.lastBrick.color;
             this.movingBlock.runAction(cc.tintBy(0.1, -5, -10, 0))
         } else {
+            // Random color for new block
             let randomId = this.getRandomInt(this.color.totalNumber);
             this.movingBlock.color = cc.hexToColor(this.color[randomId]);
+            // avoid same color
+            if (this.movingBlock.color === this.lastBrick.color) {
+                this.movingBlock.runAction(cc.tintBy(0.1, -5, -10, 0))
+            }
         }
 
         this.movingBlock.width = this.lastBrick.width;
@@ -169,10 +175,10 @@ cc.Class({
 
         if (Math.random() >= 0.5) {
             this.movingBlock.setPosition(this.canvasEdgeLeft + this.movingBlock.width/2, prevY + this.blockHeight);
-            this.movingBlock.getComponent(blockScript).moveFrom('left', moveDistance);
+            this.movingBlock.getComponent(blockScript).moveFrom(this.moveDuration, 'left', moveDistance);
         } else {
             this.movingBlock.setPosition(this.canvasEdgeRight - this.movingBlock.width/2, prevY + this.blockHeight);
-            this.movingBlock.getComponent(blockScript).moveFrom('right', moveDistance);
+            this.movingBlock.getComponent(blockScript).moveFrom(this.moveDuration, 'right', moveDistance);
         }
         this.node.addChild(this.movingBlock);
     },
@@ -239,24 +245,19 @@ cc.Class({
 
 
             this.node.addChild(fragment);
-            // let bezier = [cc.p(0, 20), cc.p(30, -10), cc.p(30, 10)];
-            // let bezierForward = cc.bezierBy(1, bezier);
             let spawn = cc.spawn(cc.fadeOut(0.5),
                                  cc.rotateBy(1, 360),
                                  jumpAction,
                                  cc.moveBy(3, cc.p(0, -150)));
-            // fragment.runAction(spawn);
-            // let recycleFragment = cc.callFunc(function () {
-            //     fragment.getComponent(fragmentScript).recycle();
-            //     fragmentScript = null;
-            // }, self);
             let kill = cc.callFunc(function() {
                 fragment.getComponent(fragmentScript).kill();
-            });
+            }, self);
             fragment.runAction(cc.sequence(spawn, cc.delayTime(0.5), kill));
 
-        } else {            // if the block is dropped 'perfectly' (within threshold)
+        // if the block is dropped 'perfectly' (within threshold)
+        } else {            
             this.combo += 1;
+            this.sparkAt(this.lastBrick.y + this.lastBrick.height/2);
             cc.audioEngine.play(this.dropSound3, false, 0.5);
             // auto align the blocks
             block.width = this.lastBrick.width;
@@ -265,10 +266,27 @@ cc.Class({
 
         this.lastBrick = block;
         this.scoreLabel.string += 1;
+        
+        if (this.moveDuration > this.minMoveDuration) {
+            this.moveDuration -= 0.02;
+            cc.log("duration: " + this.moveDuration);
+        }
     },
 
     kill(blockNode) {
         this.blockPool.put(blockNode);
         // cc.log("Put 1 block back to pool, id=" + blockNode.getComponent(blockScript).id);
+    },
+
+    sparkAt(yPosition) {
+        let sparkParticle = this.getSpark();
+        sparkParticle.setPosition(0, yPosition);
+        sparkParticle.zIndex = 100;
+        this.node.addChild(sparkParticle);
+        let killAction = cc.callFunc(function() {
+            sparkParticle.getComponent(sparkScript).kill();
+            // cc.log("put");
+        }, this);
+        sparkParticle.runAction(cc.sequence(cc.fadeOut(2), killAction));
     },
 });

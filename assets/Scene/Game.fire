@@ -427,6 +427,11 @@
     },
     "backgroundSound": {
       "__uuid__": "cca47c5c-e406-47d4-a9ba-4851feab9cdb"
-    }
+    },
+    "sparkParticlePrefab": {
+      "__uuid__": "83a64141-c88a-4291-a37c-5f0863a4c4ad"
+    },
+    "minMoveDuration": 0.1,
+    "maxMoveDuration": 2
   }
 ]
