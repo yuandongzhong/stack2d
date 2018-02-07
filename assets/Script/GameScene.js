@@ -37,12 +37,17 @@ cc.Class({
             default: null,
             type: cc.Prefab,
         },
+        menu: {
+            default: null,
+            type: cc.Node,
+        },
 
         minMoveDuration: 0.3,
         maxMoveDuration: 2.3, 
     },
 
     onLoad () {
+        this.menu.zIndex = 90;
         this.color = {
             totalNumber: 7,
             0: '#EA4C81',
@@ -69,22 +74,30 @@ cc.Class({
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
 
         this.createBlockPoolFor(25);
-        // this.createSparkPoolFor(7);
         this.spawnBaseBlocksFor(4);     
         this.spawnNewBlock(); 
-        this.setInputControl();
+        // this.enableInput();
 
-        // cc.director.getPhysicsManager().enabled = true;
-        // cc.director.getPhysicsManager().debugDrawFlags = cc.PhysicsManager.DrawBits.e_aabbBit |
-        // cc.PhysicsManager.DrawBits.e_pairBit |
-        // cc.PhysicsManager.DrawBits.e_centerOfMassBit |
-        // cc.PhysicsManager.DrawBits.e_jointBit |
-        // cc.PhysicsManager.DrawBits.e_shapeBit;   
-        // cc.audioEngine.preload(this.backgroundSound);
+        // this.soundOn = cc.sys.localStorage.getItem('sound');
+        // if (this.soundOn === null) {
+        //     this.soundOn = true;
+        //     cc.sys.localStorage.setItem('sound', this.soundOn);
+        // }
+
+        cc.audioEngine.preload(this.backgroundSound);
     },
 
     start () {
-        this.current = cc.audioEngine.play(this.backgroundSound, true, 0.5);
+        // console.log("isSoundOn" + this.isSoundOn);
+
+        this.playBgSound();
+
+        // if (this.soundOn === true) {
+        //     this.playBgSound();
+        // } else {
+        //     // cc.audioEngine.uncache(this.backgroundSound);
+        // }
+
         cc.director.preloadScene("GameOver", function () {
             cc.log("Game over scene preloaded");
         });
@@ -184,21 +197,21 @@ cc.Class({
         this.node.addChild(this.movingBlock);
     },
 
-    setInputControl () {
+    enableInput () {
         let self = this;
+        this.node.on('touchstart', this._touchScreen,this);
+        cc.log("set");
+    },
 
-        self.node.on('touchstart', function(event) {
-            // cc.log("click -------------------");
-            self.movingBlock.getComponent(blockScript).drop(); 
-            // cc.log("drop -------------------");
-            self.trimBlock();
-            self.spawnNewBlock();
-            // cc.log("spawn -------------------");
-            // cc.log("block count: " + this.blockCount);
-            // cc.log("Emit -------------------");
-            self.eventController.sendEvent('tap');
+    disableInput() {
+        this.node.off('touchstart', this._touchScreen,this);
+    },
 
-        }, this);
+    _touchScreen() {
+        this.movingBlock.getComponent(blockScript).drop(); 
+        this.trimBlock();
+        this.spawnNewBlock();
+        this.eventController.sendEvent('tap');
     },
 
     trimBlock () {
@@ -216,9 +229,9 @@ cc.Class({
 
             // Play random drop sounds
             if (Math.random() >= 0.5) {
-                cc.audioEngine.play(this.dropSound1, false, 1);
+                this.dropSoundEngineA = cc.audioEngine.play(this.dropSound1, false, 1);
             } else {
-                cc.audioEngine.play(this.dropSound2, false, 1);
+                this.dropSoundEngineB = cc.audioEngine.play(this.dropSound2, false, 1);
             }
 
             // Check if the drop is dropped on 'air'; if so, then game over.
@@ -261,7 +274,7 @@ cc.Class({
         } else {            
             this.combo += 1;
             this.sparkAt(this.lastBrick.y + this.lastBrick.height/2);
-            cc.audioEngine.play(this.dropSound3, false, 0.5);
+            this.dropSoundEngineC = cc.audioEngine.play(this.dropSound3, false, 0.5);
             // auto align the blocks
             block.width = this.lastBrick.width;
             block.x = prevX;
@@ -329,5 +342,24 @@ cc.Class({
             // cc.log("put");
         }, this);
         sparkParticle.runAction(cc.sequence(cc.fadeOut(2), killAction));
+    },
+
+    toggleSoundOn(isOn) {
+        if (isOn) {
+            // this.dropSoundEngineA
+            // this.dropSoundEngineB
+            // this.dropSoundEngineC
+            this.playBgSound();
+            // cc.audioEngine.stop(this.bgSoundEngine);
+            // cc.audioEngine.uncache(this.backgroundSound);
+        } else {
+            cc.audioEngine.stop(this.bgSoundEngine);
+            cc.audioEngine.uncache(this.backgroundSound);
+        }
+    },
+
+    playBgSound() {
+        // console.log("sound played");
+        this.bgSoundEngine = cc.audioEngine.play(this.backgroundSound, true, 0.5);
     },
 });
