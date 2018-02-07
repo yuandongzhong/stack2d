@@ -38,7 +38,7 @@ cc.Class({
             type: cc.Prefab,
         },
 
-        minMoveDuration: 0.1,
+        minMoveDuration: 0.3,
         maxMoveDuration: 2.3, 
     },
 
@@ -58,16 +58,17 @@ cc.Class({
         this.prevBlockPos = 0;
         this.blockHeight = 0;
         this.combo = 0;
-        this.scoreLabel.string = 0;
+        this.scoreLabel.string = "";
+        this.score = 0;
         this.canvasEdgeLeft = -this.node.width / 2;
         this.canvasEdgeRight = this.node.width / 2;
-        this.moveDuration = this.maxMoveDuration;
+        this.moveDuration = 2.3;
     
         this.movingBlock = null;                                        // the current moving block
         this.lastBrick = null;                                          // the last 'dropped' block
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
 
-        this.createBlockPoolFor(15);
+        this.createBlockPoolFor(25);
         // this.createSparkPoolFor(7);
         this.spawnBaseBlocksFor(4);     
         this.spawnNewBlock(); 
@@ -207,8 +208,10 @@ cc.Class({
         let dx = prevX - block.x;
 
         // Check if the block is dropped on the left or right
-        // Minimum threshold: 4px -> make the game easier for the player
-        if (dx != 0 && Math.abs(dx) > 4) {   
+        // threshold -> make the game easier for the player
+        let threshold = this.score < 40 ? 3 : 5;
+
+        if (Math.abs(dx) > threshold) {   
             this.combo = 0;
 
             // Play random drop sounds
@@ -219,7 +222,7 @@ cc.Class({
             }
 
             // Check if the drop is dropped on 'air'; if so, then game over.
-            if (Math.abs(dx) > (block.width/2 + this.lastBrick.width/2)) {
+            if (Math.abs(dx) > (block.width/2 + this.lastBrick.width/2) + 2) {
                 cc.director.loadScene("GameOver");
                 return; 
             }
@@ -262,14 +265,52 @@ cc.Class({
             // auto align the blocks
             block.width = this.lastBrick.width;
             block.x = prevX;
+
+            // slow down speed for reward
+            if (this.moveDuration > this.minMoveDuration) {
+                if (this.score <= 10 ) {
+                // do nothing
+                } else if (10 < this.score <= 30) {
+                    if (this.combo < 3) {
+                        this.moveDuration += 0.002
+                    } else {
+                        this.moveDuration += 0.004
+                    }
+                } else if (30 < this.score < 70) {
+                    if (this.combo < 3) {
+                        this.moveDuration += 0.01
+                    } else {
+                        this.moveDuration += 0.02
+                    }
+                } else {
+                    if (block.width > 60) {
+                        if (this.combo < 3) {
+                            this.moveDuration += 0.02
+                        } else {
+                            this.moveDuration += 0.04
+                        }
+                    } else {            // if block width is small, then more reward
+                        this.moveDuration += 0.05
+                    }
+                }
+            }
         }
 
         this.lastBrick = block;
-        this.scoreLabel.string += 1;
+        this.score += 1;
+        this.scoreLabel.string = this.score;
         
+        // Increase speed
         if (this.moveDuration > this.minMoveDuration) {
-            this.moveDuration -= 0.02;
-            cc.log("duration: " + this.moveDuration);
+            if (this.score <= 10 ) {
+                this.moveDuration -= 0.3 * (1 / this.score);
+            } else if (10 < this.score <= 30) {
+                this.moveDuration -= 0.2 * (1 / this.score);
+            } else if (30 < this.score < 70) {
+                this.moveDuration -= 0.008 * (1 / this.score);
+            } else {
+                this.moveDuration -= 0.005;
+            }
         }
     },
 
