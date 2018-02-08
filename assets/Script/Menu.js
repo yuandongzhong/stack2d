@@ -33,8 +33,12 @@ cc.Class({
     },
 
     clickStart() {
-        this.node.runAction(cc.fadeOut(0.5));
+        let fadeOutTime = 0.2
+        this.node.runAction(cc.fadeOut(fadeOutTime));
         this.scene.startGame();
+        this.scheduleOnce(function() {
+            this.node.destroy();
+        }, fadeOutTime + 0.1);
     },
 
     tapSoundSwitch() {
