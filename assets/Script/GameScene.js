@@ -47,16 +47,17 @@ cc.Class({
     },
 
     onLoad () {
+        this.isGameOn = false;
         this.menu.zIndex = 90;
         this.color = {
             totalNumber: 7,
             0: '#EA4C81',
             1: '#5ABDD1',
             2: '#33A9CE',
-            3: '71FEB9',
-            4: 'F4FEB9',
-            5: '72F7FE',
-            6: '36969D',
+            3: '#71FEB9',
+            4: '#F4FEB9',
+            5: '#72F7FE',
+            6: '#36969D',
         }
 
         this.blockCount = 0;
@@ -74,8 +75,8 @@ cc.Class({
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
 
         this.createBlockPoolFor(25);
-        this.spawnBaseBlocksFor(4);     
-        this.spawnNewBlock(); 
+        this.spawnBaseBlocksFor(5);     
+        // this.spawnNewBlock(); 
         // this.enableInput();
 
         // this.soundOn = cc.sys.localStorage.getItem('sound');
@@ -177,9 +178,13 @@ cc.Class({
             // Random color for new block
             let randomId = this.getRandomInt(this.color.totalNumber);
             this.movingBlock.color = cc.hexToColor(this.color[randomId]);
+            
             // avoid same color
-            if (this.movingBlock.color === this.lastBrick.color) {
-                this.movingBlock.runAction(cc.tintBy(0.1, -5, -10, 0))
+            if (this.movingBlock.color.r ===  this.lastBrick.color.r &&
+                this.movingBlock.color.g ===  this.lastBrick.color.g &&
+                this.movingBlock.color.b ===  this.lastBrick.color.b) {
+                this.movingBlock.runAction(cc.tintBy(10, 10, 10, 0));
+                // console.log("color change");
             }
         }
 
@@ -361,5 +366,12 @@ cc.Class({
     playBgSound() {
         // console.log("sound played");
         this.bgSoundEngine = cc.audioEngine.play(this.backgroundSound, true, 0.5);
+    },
+
+
+    startGame() {
+        this.isGameOn = true;
+        this.spawnNewBlock();
+        this.enableInput();
     },
 });

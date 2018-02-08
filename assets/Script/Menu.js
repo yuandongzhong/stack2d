@@ -47,7 +47,7 @@ cc.Class({
 
     clickStart() {
         this.node.runAction(cc.fadeOut(0.5));
-        this.scene.enableInput();
+        this.scene.startGame();
     },
 
     tapSoundSwitch() {
