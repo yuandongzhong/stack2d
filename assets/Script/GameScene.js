@@ -1,6 +1,9 @@
+// import { Glob } from '../../../../../Library/Caches/typescript/2.6/node_modules/@types/glob';
+
 let blockScript = require('Block');
 let fragmentScript = require('Fragment');
 let sparkScript = require('Spark');
+let Global = require('Global');
 
 cc.Class({
     extends: cc.Component,
@@ -36,7 +39,7 @@ cc.Class({
         sparkParticlePrefab: {
             default: null,
             type: cc.Prefab,
-        },
+        },  
         menu: {
             default: null,
             type: cc.Node,
@@ -47,7 +50,8 @@ cc.Class({
     },
 
     onLoad () {
-        this.isGameOn = false;
+        // cc.log("onLoad");
+
         this.menu.zIndex = 90;
         this.color = {
             totalNumber: 7,
@@ -76,8 +80,6 @@ cc.Class({
 
         this.createBlockPoolFor(25);
         this.spawnBaseBlocksFor(5);     
-        // this.spawnNewBlock(); 
-        // this.enableInput();
 
         // this.soundOn = cc.sys.localStorage.getItem('sound');
         // if (this.soundOn === null) {
@@ -91,15 +93,16 @@ cc.Class({
     start () {
         // console.log("isSoundOn" + this.isSoundOn);
 
-        this.playBgSound();
 
-        // if (this.soundOn === true) {
-        //     this.playBgSound();
-        // } else {
-        //     // cc.audioEngine.uncache(this.backgroundSound);
-        // }
+        if (!Global.isGameOn) {
+            // Play background when the game is firstly loaded.
+            this.playBgSound();
+            Global.isGameOn = true;
+        } 
 
+        let self = this;
         cc.director.preloadScene("GameOver", function () {
+            self.disableInput();
             cc.log("Game over scene preloaded");
         });
     },
@@ -177,14 +180,21 @@ cc.Class({
         } else {
             // Random color for new block
             let randomId = this.getRandomInt(this.color.totalNumber);
-            this.movingBlock.color = cc.hexToColor(this.color[randomId]);
+            // this.movingBlock.color = cc.hexToColor(this.color[randomId]);
+            let newColor = cc.hexToColor(this.color[randomId]);
             
             // avoid same color
-            if (this.movingBlock.color.r ===  this.lastBrick.color.r &&
-                this.movingBlock.color.g ===  this.lastBrick.color.g &&
-                this.movingBlock.color.b ===  this.lastBrick.color.b) {
-                this.movingBlock.runAction(cc.tintBy(10, 10, 10, 0));
+            if (newColor.r ===  this.lastBrick.color.r &&
+                newColor.g ===  this.lastBrick.color.g &&
+                newColor.b ===  this.lastBrick.color.b) {
+
+                newColor.r += 0.1;
+                newColor.g += -5;
+                newColor.b += -10;
+                this.movingBlock.color = newColor;
                 // console.log("color change");
+            } else {
+                this.movingBlock.color = cc.hexToColor(this.color[randomId]);
             }
         }
 
@@ -205,7 +215,7 @@ cc.Class({
     enableInput () {
         let self = this;
         this.node.on('touchstart', this._touchScreen,this);
-        cc.log("set");
+        // cc.log("set");
     },
 
     disableInput() {
@@ -351,12 +361,7 @@ cc.Class({
 
     toggleSoundOn(isOn) {
         if (isOn) {
-            // this.dropSoundEngineA
-            // this.dropSoundEngineB
-            // this.dropSoundEngineC
             this.playBgSound();
-            // cc.audioEngine.stop(this.bgSoundEngine);
-            // cc.audioEngine.uncache(this.backgroundSound);
         } else {
             cc.audioEngine.stop(this.bgSoundEngine);
             cc.audioEngine.uncache(this.backgroundSound);
@@ -364,13 +369,11 @@ cc.Class({
     },
 
     playBgSound() {
-        // console.log("sound played");
         this.bgSoundEngine = cc.audioEngine.play(this.backgroundSound, true, 0.5);
     },
 
 
     startGame() {
-        this.isGameOn = true;
         this.spawnNewBlock();
         this.enableInput();
     },
