@@ -105,6 +105,8 @@ cc.Class({
             self.disableInput();
             cc.log("Game over scene preloaded");
         });
+
+        Global.currentScore = this.score;
     },
 
 
@@ -327,6 +329,7 @@ cc.Class({
         this.lastBrick = block;
         this.score += 1;
         this.scoreLabel.string = this.score;
+        Global.currentScore = this.score;
         
         // Increase speed
         if (this.moveDuration > this.minMoveDuration) {

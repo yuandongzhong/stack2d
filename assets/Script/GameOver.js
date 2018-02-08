@@ -1,18 +1,18 @@
-// Learn cc.Class:
-//  - [Chinese] http://www.cocos.com/docs/creator/scripting/class.html
-//  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/class/index.html
-// Learn Attribute:
-//  - [Chinese] http://www.cocos.com/docs/creator/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/reference/attributes/index.html
-// Learn life-cycle callbacks:
-//  - [Chinese] http://www.cocos.com/docs/creator/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/life-cycle-callbacks/index.html
+let Global = require('Global');
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
+        currentScoreLabel: {
+            default: null,
+            type: cc.Label,
+        },
 
+        bestScoreLabel: {
+            default: null,
+            type: cc.Label,
+        },
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -21,6 +21,15 @@ cc.Class({
         cc.director.preloadScene("GameOver", function () {
             // cc.log("Game over scene preloaded");
         });
+
+        let bestScore = cc.sys.localStorage.getItem('score_record');
+        if (bestScore === null || bestScore < Global.currentScore) {
+            bestScore = Global.currentScore;
+            cc.sys.localStorage.setItem('score_record', Global.currentScore);
+        }
+
+        this.currentScoreLabel.string = "Score\n" + Global.currentScore;
+        this.bestScoreLabel.string = "Best\n" + bestScore;
     },
 
     start () {
