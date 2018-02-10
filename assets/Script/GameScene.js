@@ -80,15 +80,13 @@ cc.Class({
         this.spawnBaseBlocksFor(5);     
         cc.audioEngine.preload(this.backgroundSound);
 
-        // this.pluginReview  = this.node.getComponent('PluginReview');
-
-        this.admob  = this.node.getComponent('Admob');
+        if (!Global.isGameOn) {
+            this.admobInit();
+        } 
     },
 
     start () {
         // console.log("isSoundOn" + this.isSoundOn);
-
-
         if (!Global.isGameOn) {
             // Play background when the game is firstly loaded.
             this.playBgSound();
@@ -104,9 +102,29 @@ cc.Class({
         Global.currentScore = this.score;
 
         // this.pluginReview.show();
-        this.admob.showBanner();
+        this.showBanner();
 
     },
+
+    admobInit () {
+        if(cc.sys.isMobile) {
+            sdkbox.PluginAdMob.init();
+            // sdkbox.PluginAdMob.cache("banner");
+        }
+    },
+
+    showBanner () {
+        if(cc.sys.isMobile) {
+            sdkbox.PluginAdMob.show('banner');
+        }
+    },
+
+    hideBanner() {
+        if(cc.sys.isMobile) {
+            sdkbox.PluginAdMob.hide('banner');
+        }
+    },
+
 
 
     // update (dt) {
