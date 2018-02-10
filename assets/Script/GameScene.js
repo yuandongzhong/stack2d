@@ -2,7 +2,6 @@ let blockScript = require('Block');
 let fragmentScript = require('Fragment');
 let sparkScript = require('Spark');
 let Global = require('Global');
-let admobScript = require('Admob');
 
 cc.Class({
     extends: cc.Component,
@@ -49,7 +48,7 @@ cc.Class({
     },
 
     onLoad () {
-        // cc.log("onLoad");
+        cc.log("onLoad - main");
 
         this.menu.zIndex = 90;
         this.color = {
@@ -81,7 +80,8 @@ cc.Class({
         this.spawnBaseBlocksFor(5);     
         cc.audioEngine.preload(this.backgroundSound);
 
-        // this.admob  = this.node.getComponent('Admob');
+        this.pluginReview  = this.node.getComponent('PluginReview');
+
     },
 
     start () {
@@ -102,7 +102,8 @@ cc.Class({
 
         Global.currentScore = this.score;
 
-        // this.admob.showBanner();
+        // this.pluginReview.show();
+
     },
 
 

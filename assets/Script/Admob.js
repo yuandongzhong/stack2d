@@ -8,6 +8,7 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        // cc.game.addPersistRootNode(this.node);
         this.admobInit();
     },
 
@@ -17,7 +18,7 @@ cc.Class({
 
     admobInit () {
         if(cc.sys.isMobile) {
-            let self = this
+            // let self = this
             // sdkbox.PluginAdMob.setListener({
             //     adViewDidReceiveAd: function(name) {
             //         // self.showInfo('adViewDidReceiveAd name=' + name);

@@ -752,7 +752,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 177.77,
+      "width": 357.9,
       "height": 80
     },
     "_rotationX": 0,
@@ -780,14 +780,14 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_actualFontSize": 80,
-    "_fontSize": 80,
+    "_actualFontSize": 70,
+    "_fontSize": 70,
     "_lineHeight": 80,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "Brick",
+    "_N$string": "Color Block",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -1005,7 +1005,7 @@
     },
     "_children": [],
     "_tag": -1,
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 26
@@ -1298,7 +1298,7 @@
     },
     "_children": [],
     "_tag": -1,
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 33
@@ -1533,12 +1533,12 @@
     "maxMoveDuration": 2
   },
   {
-    "__type__": "c0bacQPXQ9J67YnYeNQYOmB",
+    "__type__": "285acA7JiRGipfiHpIYHXeV",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 4
     },
-    "_enabled": false
+    "_enabled": true
   }
 ]
