@@ -140,6 +140,9 @@
       },
       {
         "__id__": 38
+      },
+      {
+        "__id__": 39
       }
     ],
     "_prefab": null,
@@ -1528,5 +1531,14 @@
     },
     "minMoveDuration": 0.1,
     "maxMoveDuration": 2
+  },
+  {
+    "__type__": "c0bacQPXQ9J67YnYeNQYOmB",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 4
+    },
+    "_enabled": false
   }
 ]

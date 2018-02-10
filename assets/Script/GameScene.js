@@ -1,9 +1,8 @@
-// import { Glob } from '../../../../../Library/Caches/typescript/2.6/node_modules/@types/glob';
-
 let blockScript = require('Block');
 let fragmentScript = require('Fragment');
 let sparkScript = require('Spark');
 let Global = require('Global');
+let admobScript = require('Admob');
 
 cc.Class({
     extends: cc.Component,
@@ -80,14 +79,9 @@ cc.Class({
 
         this.createBlockPoolFor(25);
         this.spawnBaseBlocksFor(5);     
-
-        // this.soundOn = cc.sys.localStorage.getItem('sound');
-        // if (this.soundOn === null) {
-        //     this.soundOn = true;
-        //     cc.sys.localStorage.setItem('sound', this.soundOn);
-        // }
-
         cc.audioEngine.preload(this.backgroundSound);
+
+        // this.admob  = this.node.getComponent('Admob');
     },
 
     start () {
@@ -107,6 +101,8 @@ cc.Class({
         });
 
         Global.currentScore = this.score;
+
+        // this.admob.showBanner();
     },
 
 
@@ -177,8 +173,13 @@ cc.Class({
 
         if (this.combo > 0) {
             // Darken the color for combos
-            this.movingBlock.color = this.lastBrick.color;
-            this.movingBlock.runAction(cc.tintBy(0.1, -5, -10, 0))
+            // this.movingBlock.color = this.lastBrick.color;
+            let newColor = this.lastBrick.color;
+            // this.movingBlock.runAction(cc.tintBy(0.1, -5, -10, 0))
+            newColor.r += 0.1;
+            newColor.g += -5;
+            newColor.b += -10;
+            this.movingBlock.color = newColor;
         } else {
             // Random color for new block
             let randomId = this.getRandomInt(this.color.totalNumber);

@@ -30,13 +30,16 @@ cc.Class({
 
         this.currentScoreLabel.string = "Score\n" + Global.currentScore;
         this.bestScoreLabel.string = "Best\n" + bestScore;
+
+        this.admob  = this.node.getComponent('Admob');
     },
 
     start () {
-
+        this.admob.showBanner();
     },
 
     restart() {
+        this.admob.hideBanner();
         cc.director.loadScene("Game");
     },
 
