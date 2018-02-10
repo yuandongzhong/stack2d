@@ -80,8 +80,9 @@ cc.Class({
         this.spawnBaseBlocksFor(5);     
         cc.audioEngine.preload(this.backgroundSound);
 
-        this.pluginReview  = this.node.getComponent('PluginReview');
+        // this.pluginReview  = this.node.getComponent('PluginReview');
 
+        this.admob  = this.node.getComponent('Admob');
     },
 
     start () {
@@ -103,6 +104,7 @@ cc.Class({
         Global.currentScore = this.score;
 
         // this.pluginReview.show();
+        this.admob.showBanner();
 
     },
 

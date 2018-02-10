@@ -3,7 +3,7 @@
     "appID": "680678078",
     "appSecret": "49edd9d50b67ff77ba5beecb9a431382",
     "channel": "color_block",
-    "enable": true,
+    "enable": false,
     "version": "1"
   },
   "collision-matrix": [

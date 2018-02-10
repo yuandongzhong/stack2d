@@ -40,20 +40,21 @@ cc.Class({
             //     }
             // });
             sdkbox.PluginAdMob.init();
-            sdkbox.PluginAdMob.cache("banner");
+            // sdkbox.PluginAdMob.cache("banner");
         }
     },
 
     showBanner () {
         if(cc.sys.isMobile) {
+            sdkbox.PluginAdMob.cache("banner");
             sdkbox.PluginAdMob.show('banner');
         }
     },
 
     hideBanner() {
-        if(cc.sys.isMobile) {
-            sdkbox.PluginAdMob.hide('banner');
-        }
+        // if(cc.sys.isMobile) {
+        //     sdkbox.PluginAdMob.hide('banner');
+        // }
     },
 
     // cacheInterstitial: function() {

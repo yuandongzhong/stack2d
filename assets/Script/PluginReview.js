@@ -14,7 +14,10 @@ cc.Class({
         // sdkbox.PluginReview.setCustomPromptRateButtonTitle("custom rate");
         // sdkbox.PluginReview.setCustomPromptRateLaterButtonTitle("custom rate later");
 
-        sdkbox.PluginReview.init();
+
+        if(cc.sys.isMobile) {
+            sdkbox.PluginReview.init();
+        }
     },
 
     start () {
