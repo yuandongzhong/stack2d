@@ -77,9 +77,9 @@ cc.Class({
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
 
         this.createBlockPoolFor(18);
-        this.createFragmentPoolFor(5);
-        this.createSparkPoolFor(6);
-        this.spawnBaseBlocksFor(5);     
+        this.createFragmentPoolFor(10);
+        this.createSparkPoolFor(12);
+        this.spawnBaseBlocksFor(6);     
         cc.audioEngine.preload(this.backgroundSound);
 
         // if (!Global.isGameOn) {
@@ -388,7 +388,7 @@ cc.Class({
 
     recycleSpark(node) {
         this.sparkPool.put(node);
-        // cc.log("recycled fragment node #" + node.getComponent('Fragment').id);
+        // cc.log("recycled spark node #" + node.getComponent('Spark').id);
     },
 
 
