@@ -76,13 +76,17 @@ cc.Class({
         this.lastBrick = null;                                          // the last 'dropped' block
         this.eventController = cc.find('EventController').getComponent('RegisterEvents');
 
-        this.createBlockPoolFor(25);
+        this.createBlockPoolFor(18);
+        this.createFragmentPoolFor(5);
+        this.createSparkPoolFor(6);
         this.spawnBaseBlocksFor(5);     
         cc.audioEngine.preload(this.backgroundSound);
 
-        if (!Global.isGameOn) {
-            this.admobInit();
-        } 
+        // if (!Global.isGameOn) {
+        //     this.admobInit();
+        // } 
+
+        this.admob = this.node.getComponent('Admob');
     },
 
     start () {
@@ -100,32 +104,8 @@ cc.Class({
         });
 
         Global.currentScore = this.score;
-
-        // this.pluginReview.show();
-        this.showBanner();
-
+        this.admob.showBanner();
     },
-
-    admobInit () {
-        if(cc.sys.isMobile) {
-            sdkbox.PluginAdMob.init();
-            // sdkbox.PluginAdMob.cache("banner");
-        }
-    },
-
-    showBanner () {
-        if(cc.sys.isMobile) {
-            sdkbox.PluginAdMob.show('banner');
-        }
-    },
-
-    hideBanner() {
-        if(cc.sys.isMobile) {
-            sdkbox.PluginAdMob.hide('banner');
-        }
-    },
-
-
 
     // update (dt) {
     //     // console.log("Child count:" + this.node.childrenCount);
@@ -148,6 +128,24 @@ cc.Class({
         }
     },
 
+    createFragmentPoolFor(quantity = 16) {
+        this.fragmentPool = new cc.NodePool(fragmentScript);
+        for (let i = 0; i < quantity; ++i) {
+            let fragment = cc.instantiate(this.fragmentPrefab);
+            fragment.getComponent(fragmentScript).id = i;
+            this.fragmentPool.put(fragment); 
+        }
+    },
+
+    createSparkPoolFor(quantity = 6) {
+        this.sparkPool = new cc.NodePool(sparkScript);
+        for (let i = 0; i < quantity; ++i) {
+            let spark = cc.instantiate(this.sparkParticlePrefab);
+            spark.getComponent(sparkScript).id = i;
+            this.sparkPool.put(spark); 
+        }
+    },
+
     getBlock() {
         if (this.blockPool.size() > 0) {                // use size method to check if there're nodes available in the pool
             return this.blockPool.get();
@@ -156,15 +154,26 @@ cc.Class({
         }   
     }, 
 
+
     getSpark() {
-        let spark = cc.instantiate(this.sparkParticlePrefab);
+        // let spark = cc.instantiate(this.sparkParticlePrefab);
         // if the spark created from scratch, then set auto remove
-        spark.autoRemoveOnFinish = true;  
-        return spark;
+        // spark.autoRemoveOnFinish = true;  
+        // return spark;
+        if (this.sparkPool.size() > 0) {                
+            return this.sparkPool.get();
+        } else {                                       
+            return cc.instantiate(this.sparkParticlePrefab);
+        }   
     },
 
     getFragment() {
-        return cc.instantiate(this.fragmentPrefab);
+        if (this.fragmentPool.size() > 0) {           
+            return this.fragmentPool.get();
+        } else {                                       
+            return cc.instantiate(this.fragmentPrefab);
+        }   
+        // return cc.instantiate(this.fragmentPrefab);
     },
 
     spawnBaseBlocksFor (baseBlockNumber) {
@@ -275,6 +284,7 @@ cc.Class({
 
             // Check if the drop is dropped on 'air'; if so, then game over.
             if (Math.abs(dx) > (block.width/2 + this.lastBrick.width/2) + 2) {
+                this.admob.showBanner();
                 cc.director.loadScene("GameOver");
                 return; 
             }
@@ -285,9 +295,10 @@ cc.Class({
             block.x = block.x + dx/2;
 
             // drop the fragment
-            let fragment = this.getFragment();
+            let fragment = self.getFragment();
             fragment.color = block.color;
             fragment.width = Math.abs(dx);
+            fragment.opacity = 100;             // Reset opacity after recycled
 
             let jumpAction = null;
             if (dx > 0) {
@@ -298,16 +309,14 @@ cc.Class({
                 jumpAction = cc.jumpBy(0.6, cc.p(45, 0), 60, 1)
             }
 
-
             this.node.addChild(fragment);
+            
+            // cc.log("create fragment node #" + fragment.getComponent('Fragment').id);
             let spawn = cc.spawn(cc.fadeOut(0.5),
                                  cc.rotateBy(1, 360),
                                  jumpAction,
                                  cc.moveBy(3, cc.p(0, -150)));
-            let kill = cc.callFunc(function() {
-                fragment.getComponent(fragmentScript).kill();
-            }, self);
-            fragment.runAction(cc.sequence(spawn, cc.delayTime(0.5), kill));
+            fragment.runAction(spawn);
 
         // if the block is dropped 'perfectly' (within threshold)
         } else {            
@@ -372,16 +381,30 @@ cc.Class({
         // cc.log("Put 1 block back to pool, id=" + blockNode.getComponent(blockScript).id);
     },
 
+    recycleFragment(node) {
+        this.fragmentPool.put(node);
+        // cc.log("recycled fragment node #" + node.getComponent('Fragment').id);
+    },
+
+    recycleSpark(node) {
+        this.sparkPool.put(node);
+        // cc.log("recycled fragment node #" + node.getComponent('Fragment').id);
+    },
+
+
     sparkAt(yPosition) {
         let sparkParticle = this.getSpark();
+        sparkParticle.opacity = 100;
         sparkParticle.setPosition(0, yPosition);
         sparkParticle.zIndex = 100;
+        sparkParticle.getComponent(cc.ParticleSystem).resetSystem();
         this.node.addChild(sparkParticle);
-        let killAction = cc.callFunc(function() {
-            sparkParticle.getComponent(sparkScript).kill();
-            // cc.log("put");
-        }, this);
-        sparkParticle.runAction(cc.sequence(cc.fadeOut(2), killAction));
+        sparkParticle.runAction(cc.fadeOut(1.5));
+        // let killAction = cc.callFunc(function() {
+        //     sparkParticle.getComponent(sparkScript).kill();
+        //     // cc.log("put");
+        // }, this);
+        // sparkParticle.runAction(cc.sequence(cc.fadeOut(2), killAction));
     },
 
     toggleSoundOn(isOn) {
@@ -401,5 +424,6 @@ cc.Class({
     startGame() {
         this.spawnNewBlock();
         this.enableInput();
+        this.admob.hideBanner();
     },
 });

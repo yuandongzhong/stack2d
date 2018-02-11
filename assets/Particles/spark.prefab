@@ -76,34 +76,34 @@
       "__uuid__": "848213f8-1358-4bf6-bed6-ad906eeb3781"
     },
     "_srcBlendFactor": 770,
-    "_dstBlendFactor": 771,
+    "_dstBlendFactor": 1,
     "playOnLoad": true,
-    "_autoRemoveOnFinish": true,
-    "_totalParticles": 150,
-    "_duration": -1,
-    "_emissionRate": 10,
-    "_life": 1,
+    "_autoRemoveOnFinish": false,
+    "_totalParticles": 414,
+    "_duration": 0.1,
+    "_emissionRate": 228.7292817679558,
+    "_life": 1.81,
     "_lifeVar": 0,
     "_startColor": {
       "__type__": "cc.Color",
       "r": 255,
-      "g": 255,
-      "b": 255,
+      "g": 204,
+      "b": 51,
       "a": 255
     },
     "_startColorVar": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
-      "a": 255
+      "r": 102,
+      "g": 102,
+      "b": 102,
+      "a": 127
     },
     "_endColor": {
       "__type__": "cc.Color",
       "r": 255,
-      "g": 255,
-      "b": 255,
-      "a": 0
+      "g": 153,
+      "b": 102,
+      "a": 255
     },
     "_endColorVar": {
       "__type__": "cc.Color",
@@ -112,13 +112,13 @@
       "b": 0,
       "a": 0
     },
-    "_angle": 90,
-    "_angleVar": 20,
-    "_startSize": 50,
-    "_startSizeVar": 0,
-    "_endSize": 0,
+    "_angle": -46,
+    "_angleVar": 153,
+    "_startSize": 19,
+    "_startSizeVar": 12,
+    "_endSize": 9,
     "_endSizeVar": 0,
-    "_startSpin": 0,
+    "_startSpin": 720,
     "_startSpinVar": 0,
     "_endSpin": 0,
     "_endSpinVar": 0,
@@ -129,19 +129,19 @@
     },
     "_posVar": {
       "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
+      "x": -10,
+      "y": 15
     },
     "_positionType": 0,
     "_emitterMode": 0,
     "_gravity": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 0
+      "y": 40
     },
-    "_speed": 180,
-    "_speedVar": 50,
-    "_tangentialAccel": 80,
+    "_speed": 145,
+    "_speedVar": 197,
+    "_tangentialAccel": 0,
     "_tangentialAccelVar": 0,
     "_radialAccel": 0,
     "_radialAccelVar": 0,
@@ -161,7 +161,8 @@
     "node": {
       "__id__": 1
     },
-    "_enabled": true
+    "_enabled": true,
+    "id": null
   },
   {
     "__type__": "cc.PrefabInfo",

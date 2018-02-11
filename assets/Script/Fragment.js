@@ -2,7 +2,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-
+        id: null,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -13,30 +13,24 @@ cc.Class({
         eventController.subscribeEvent('tap', this.callback, this);
     },
 
+    start () {
+        // this.scheduleOnce(function() {
+        //     // cc.log("Yo")
+        // }, 2);
+    },
+
     reuse () {
-        cc.log("reuse");
+        // console.log("reused!");
         this.scene = cc.find('Canvas');
         let eventController = cc.find('EventController').getComponent('RegisterEvents');
         eventController.subscribeEvent('tap', this.callback, this);
-
-        // this.scheduleOnce(function() {
-        //     this.recycle();
-        //     // cc.log("Yo")
-        // }, 2);
     },
 
     unuse () {
-        cc.log("unuse");
-        this.node.targetOff(this);
+        // console.log("unused!");
+        // this.node.targetOff(this);
         // cc.director.getActionManager().removeAllActionsFromTarget(this.node, true);
         this.node.stopAllActions();
-    },
-
-    start () {
-        // this.scheduleOnce(function() {
-        //     this.recycle();
-        //     // cc.log("Yo")
-        // }, 2);
     },
 
     callback() {
@@ -46,22 +40,17 @@ cc.Class({
             this.node.runAction(moveDown);
         }
 
-        // if (this.node.getPosition().y < -this.scene.height/2) {
-        //     this.scene.getComponent('GameScene').kill(this.node);
-        // } 
     },
 
-    // recycle() {
-    //     this.scene.getComponent('GameScene').fragmentPool.put(this.node);
-    //     cc.log("fragment recycled!")
-    // },
+    // kill() {
+    //     this.node.destroy();
+    //     cc.log("Kill!");
+    // }, 
 
-    kill() {
-        this.node.destroy();
-        // cc.log("Kill!");
-    }, 
-
-    // update (dt) {
-    //     // cc.log("alpha: " + this.node.color);
-    // },
+    update (dt) {
+        // cc.log("alpha: " + this.node.opacity);
+        if (this.node.opacity < 1) {
+            this.scene.getComponent('GameScene').recycleFragment(this.node);
+        }
+    },
 });
